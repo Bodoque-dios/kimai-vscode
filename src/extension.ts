@@ -71,7 +71,6 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 		}),
 		vscode.commands.registerCommand("kimai-vscode.refreshTimers", async () => {
-
 			if (provider) {
 				provider._refreshWebview();
 			} else {
@@ -286,7 +285,18 @@ export class KimaiTimerViewProvider implements vscode.WebviewViewProvider {
 							<div><strong>Activity:</strong> ${
 								activities.find((a) => a.id === entry.activity)?.name || ""
 							}</div>
-							<div><strong>Description:</strong> ${safeDescription}</div>
+							${
+								safeDescription !== ""
+									? `<div><strong>Description:</strong> ${safeDescription}</div>`
+									: ""
+							}
+							${
+								entry.tags && entry.tags.length
+									? `<div><strong>Tags:</strong> <span class="tags">${entry.tags
+											.map((tag) => `<span class="tag-pill">${tag}</span>`)
+											.join("")}</span></div>`
+									: ""
+							}
 						</div>
 					</div>
 	  `;
@@ -304,26 +314,34 @@ export class KimaiTimerViewProvider implements vscode.WebviewViewProvider {
 				${recentTimersHtml}
 
 				<h3>Start New Timer</h3>
-				<label for="client">Client</label>
-				<select id="client"  onchange="updateProjectOptions()">
-					${customersOptions}
-				</select>
+				<div id="newTimerSection">
+					<label for="client">Client</label>
+					<select id="client"  onchange="updateProjectOptions()">
+						${customersOptions}
+					</select>
 
-				<label for="project">Project</label>
-				<select id="project">
-					${projectsOptions}
-				</select>
+					<label for="project">Project</label>
+					<select id="project">
+						${projectsOptions}
+					</select>
 
-				<label for="activity">Activity</label>
-				<select id="activity">
-					${activitiesOptions}
-				</select>
+					<label for="activity">Activity</label>
+					<select id="activity">
+						${activitiesOptions}
+					</select>
+					<label for="tagSelector">Tags</label>
+					<div id="tagSelector">
+						<button id="toggleTagsButton" type="button">Select Tags ⏷</button>
+						<div id="tagsContainer">
+							<label><input type="checkbox" value="debugging">debugging</label><label><input type="checkbox" value="development">development</label><label><input type="checkbox" value="documentation">documentation</label><label><input type="checkbox" value="meeting">meeting</label><label><input type="checkbox" value="planning">planning</label><label><input type="checkbox" value="research">research</label><label><input type="checkbox" value="review">review</label><label><input type="checkbox" value="testing">testing</label>
+						</div>
+					</div>
 
-				<label for="description">Description</label>
-				<textarea id="description" type="text"></textarea>
+					<label for="description">Description</label>
+					<textarea id="description" type="text"></textarea>
 
-				<button onclick="start()">▶ Start Timer</button>
-
+					<button onclick="start()">▶ Start Timer</button>
+				</div>
 				<script>
 					const projectsByCustomer = ${JSON.stringify(projectsByCustomer)};
 					const vscode = acquireVsCodeApi();
@@ -333,12 +351,19 @@ export class KimaiTimerViewProvider implements vscode.WebviewViewProvider {
 						const project = document.getElementById('project').value;
 						const activity = document.getElementById('activity').value;
 						const description = document.getElementById('description').value;
+						const tagCheckboxes = document.querySelectorAll('#tagsContainer input[type=checkbox]');
+						const selectedTags = Array.from(tagCheckboxes)
+							.filter(cb => cb.checked)
+							.map(cb => cb.value)
+							.join(",");
+
 						vscode.postMessage({
 							command: 'startTimer',
 							client,
 							project,
 							activity,
-							description
+							description,
+							tags: selectedTags
 						});
 					}
 
@@ -381,6 +406,14 @@ export class KimaiTimerViewProvider implements vscode.WebviewViewProvider {
 							projectSelect.appendChild(option);
 						});
 					}
+
+					document.getElementById('toggleTagsButton').addEventListener('click', () => {
+						const container = document.getElementById('tagsContainer');
+						const button = document.getElementById('toggleTagsButton');
+						const isVisible = container.style.display === 'flex';
+						container.style.display = isVisible ? 'none' : 'flex';
+						button.textContent = isVisible ? 'Select Tags ⏷' : 'Select Tags ⏶';
+					});
 				</script>  
 				${this._commonStyles()}
 			</body>  
@@ -409,7 +442,6 @@ export class KimaiTimerViewProvider implements vscode.WebviewViewProvider {
 			);
 			return;
 		}
-
 		const response = await fetch(`${url}/api/timesheets`, {
 			method: "POST",
 			headers: {
@@ -420,6 +452,7 @@ export class KimaiTimerViewProvider implements vscode.WebviewViewProvider {
 				project: Number(message.project),
 				activity: Number(message.activity),
 				description: message.description,
+				tags: message.tags,
 			}),
 		});
 		if (!response.ok) {
@@ -519,13 +552,65 @@ export class KimaiTimerViewProvider implements vscode.WebviewViewProvider {
 		.timer-card-details.active {
 			display: block;
 		}
-
 		.timer-card:hover {
 			border-color: var(--vscode-tab-activeBorder);
 		}
 		.timer-card strong {
 			display: block;
 			margin-bottom: 2px;
+		}
+		#toggleTagsButton {
+			background: var(--vscode-button-secondaryBackground);
+			color: var(--vscode-button-foreground);
+			border: none;
+			padding: 6px 12px;
+			border-radius: 3px;
+			cursor: pointer;
+			width: 100%;
+			text-align: left;
+			margin-bottom:4px;
+			margin-top: 0px;
+		}
+		#toggleTagsButton:hover {
+			background: var(--vscode-button-secondaryHoverBackground);
+		}
+		#tagsContainer {
+			display: none;
+			flex-wrap: wrap;
+			gap: 4px;
+		}
+		#tagsContainer label {
+			display: inline-flex !important;
+			margin-top: 4px !important;
+			margin-bottom: 2px !important;
+			align-items: center;
+			background: var(--vscode-editorWidget-background);
+			border: 1px solid var(--vscode-editorWidget-border);
+			border-radius: 4px;
+			padding: 3px 6px;
+			font-size: 85%;
+			cursor: pointer;
+			/* This keeps labels at natural width */
+			white-space: nowrap;
+		}
+		#tagsContainer input[type="checkbox"] {
+			margin-right: 6px;
+		}
+		.tags {
+			display: inline-flex;
+			flex-wrap: wrap;
+			gap: 4px;
+			margin-top: 4px;
+		}
+		.tag-pill {
+			display: inline-block;
+			background: var(--vscode-editorWidget-background);
+			border: 1px solid var(--vscode-editorWidget-border);
+			border-radius: 12px;
+			padding: 2px 8px;
+			font-size: 80%;
+			color: var(--vscode-editor-foreground);
+			white-space: nowrap;
 		}
   	</style>`;
 	}

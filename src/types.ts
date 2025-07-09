@@ -21,4 +21,5 @@ export interface KimaiTimesheetEntry {
   end: string | null;
   project: number;
   activity: number;
+  tags: string[]
 }
