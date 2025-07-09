@@ -125,6 +125,7 @@ export class KimaiTimerViewProvider implements vscode.WebviewViewProvider {
 				activitiesRes,
 				activeTimesheetsRes,
 				recentTimesheetsRes,
+				tagsRes,
 			] = await Promise.all([
 				fetch(`${url}/api/customers`, {
 					headers: { Authorization: `Bearer ${token}` },
@@ -139,6 +140,9 @@ export class KimaiTimerViewProvider implements vscode.WebviewViewProvider {
 					headers: { Authorization: `Bearer ${token}` },
 				}),
 				fetch(`${url}/api/timesheets?order=DESC&size=5`, {
+					headers: { Authorization: `Bearer ${token}` },
+				}),
+				fetch(`${url}/api/tags`, {
 					headers: { Authorization: `Bearer ${token}` },
 				}),
 			]);
@@ -159,6 +163,9 @@ export class KimaiTimerViewProvider implements vscode.WebviewViewProvider {
 			if (!recentTimesheetsRes.ok) {
 				throw new Error("Failed to fetch recent timers");
 			}
+			if (!tagsRes.ok) {
+				throw new Error("Failed to fetch tags");
+			}
 
 			const [
 				customers,
@@ -166,12 +173,14 @@ export class KimaiTimerViewProvider implements vscode.WebviewViewProvider {
 				activities,
 				activeTimesheets,
 				recentTimesheets,
+				tags,
 			] = await Promise.all([
 				customersRes.json() as Promise<KimaiCustomer[]>,
 				projectsRes.json() as Promise<KimaiProject[]>,
 				activitiesRes.json() as Promise<KimaiActivity[]>,
 				activeTimesheetsRes.json() as Promise<KimaiTimesheetEntry[]>,
 				recentTimesheetsRes.json() as Promise<KimaiTimesheetEntry[]>,
+				tagsRes.json() as Promise<string[]>,
 			]);
 
 			const latestTimer = activeTimesheets[0];
@@ -187,7 +196,8 @@ export class KimaiTimerViewProvider implements vscode.WebviewViewProvider {
 				projects,
 				activities,
 				activeTimesheets,
-				recentTimesheets
+				recentTimesheets,
+				tags
 			);
 		} catch (err: any) {
 			this._view!.webview.html = `<p>Error fetching data: ${err.message}</p>`;
@@ -199,8 +209,11 @@ export class KimaiTimerViewProvider implements vscode.WebviewViewProvider {
 		projects: KimaiProject[],
 		activities: KimaiActivity[],
 		activeTimesheets: KimaiTimesheetEntry[],
-		recentTimesheets: KimaiTimesheetEntry[]
+		recentTimesheets: KimaiTimesheetEntry[],
+		tags: string[]
 	): string {
+		
+		//------------------- CUSTOMER FILTER -------------------
 		const projectsByCustomer = customers.reduce((acc, customer) => {
 			acc[customer.id] = projects.filter((p) => p.customer === customer.id);
 			return acc;
@@ -268,7 +281,6 @@ export class KimaiTimerViewProvider implements vscode.WebviewViewProvider {
 			.join("");
 
 		//------------------- RECENT TIMERS HTML -------------------
-
 		const recentTimersHtml = recentTimesheets
 			.map((entry, index) => {
 				const duration = entry.end
@@ -310,6 +322,13 @@ export class KimaiTimerViewProvider implements vscode.WebviewViewProvider {
 			})
 			.join("");
 
+		//----------------------- TAGS HTML -----------------------
+		const tagsHTML = tags
+			.map(
+				(tag) => `<label><input type="checkbox" value="${tag}">${tag}</label>`
+			)
+			.join("");
+
 		return `
 		<html>
 			<body>
@@ -340,7 +359,7 @@ export class KimaiTimerViewProvider implements vscode.WebviewViewProvider {
 					<div id="tagSelector">
 						<button id="toggleTagsButton" type="button">Select Tags ⏷</button>
 						<div id="tagsContainer">
-							<label><input type="checkbox" value="debugging">debugging</label><label><input type="checkbox" value="development">development</label><label><input type="checkbox" value="documentation">documentation</label><label><input type="checkbox" value="meeting">meeting</label><label><input type="checkbox" value="planning">planning</label><label><input type="checkbox" value="research">research</label><label><input type="checkbox" value="review">review</label><label><input type="checkbox" value="testing">testing</label>
+							${tagsHTML}
 						</div>
 					</div>
 
