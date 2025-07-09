@@ -6,7 +6,7 @@ export interface KimaiCustomer {
 export interface KimaiProject {
   id: number;
   name: string;
-  customer: KimaiCustomer | null;
+  customer: number;
 }
 
 export interface KimaiActivity {

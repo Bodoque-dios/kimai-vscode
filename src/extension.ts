@@ -203,6 +203,11 @@ export class KimaiTimerViewProvider implements vscode.WebviewViewProvider {
 		activeTimesheets: KimaiTimesheetEntry[],
 		recentTimesheets: KimaiTimesheetEntry[]
 	): string {
+		const projectsByCustomer = customers.reduce((acc, customer) => {
+			acc[customer.id] = projects.filter((p) => p.customer === customer.id);
+			return acc;
+		}, {} as Record<number, KimaiProject[]>);
+
 		//------------------- ACTIVE TIMERS HTML -------------------
 		const activeTimersHtml =
 			activeTimesheets.length > 0
@@ -300,7 +305,7 @@ export class KimaiTimerViewProvider implements vscode.WebviewViewProvider {
 
 				<h3>Start New Timer</h3>
 				<label for="client">Client</label>
-				<select id="client">
+				<select id="client"  onchange="updateProjectOptions()">
 					${customersOptions}
 				</select>
 
@@ -320,6 +325,7 @@ export class KimaiTimerViewProvider implements vscode.WebviewViewProvider {
 				<button onclick="start()">▶ Start Timer</button>
 
 				<script>
+					const projectsByCustomer = ${JSON.stringify(projectsByCustomer)};
 					const vscode = acquireVsCodeApi();
 
 					function start() {
@@ -346,6 +352,34 @@ export class KimaiTimerViewProvider implements vscode.WebviewViewProvider {
 					function toggleDetails(index) {
 						const el = document.getElementById('details-' + index);
 						el.classList.toggle('active');
+					}
+
+					function updateProjectOptions() {
+						const clientSelect = document.getElementById('client');
+						const projectSelect = document.getElementById('project');
+						const selectedClientId = clientSelect.value;
+
+						// Clear existing options
+						projectSelect.innerHTML = '';
+
+						// Get projects for selected client
+						const projects = projectsByCustomer[selectedClientId] || [];
+
+						if (projects.length < 1 ){
+							// Add placeholder option
+							const placeholder = document.createElement('option');
+							placeholder.value = '';
+							placeholder.textContent = 'No Projects available';
+							projectSelect.appendChild(placeholder);
+						}
+
+						// Populate new options
+						projects.forEach(p => {
+							const option = document.createElement('option');
+							option.value = p.id;
+							option.textContent = p.name;
+							projectSelect.appendChild(option);
+						});
 					}
 				</script>  
 				${this._commonStyles()}
