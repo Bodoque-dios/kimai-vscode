@@ -1,8 +1,10 @@
 # Kimai VSCode
 
+> **Disclaimer:** This is an unofficial extension and is not affiliated with or endorsed by the Kimai project or Microsoft.
+
 Kimai VSCode is a Visual Studio Code extension that integrates with your [Kimai](https://www.kimai.org/) time-tracking system, letting you **start, stop, and monitor timers without leaving your editor**.
 
-![Extension Screenshot](media/demo.png) <!-- you can add your own screenshot here -->
+![Extension Screenshot](https://raw.githubusercontent.com/Bodoque-dios/kimai-vscode/main/media/demo.png)
 
 ---
 
@@ -21,6 +23,7 @@ Kimai VSCode is a Visual Studio Code extension that integrates with your [Kimai]
   * Project
   * Activity
   * Description
+  * Tags
 * View active timers with the ability to stop them.
 * See your 5 most recent timers.
 

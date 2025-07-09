@@ -23,6 +23,7 @@
 	},
 	"publisher": "potx8o",
 	"author": "Matías Olea",
+	"icon": "https://raw.githubusercontent.com/Bodoque-dios/kimai-vscode/main/media/kimai-vscode.png",
 	"activationEvents": [],
 	"main": "./out/extension.js",
 	"contributes": {
