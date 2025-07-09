@@ -219,32 +219,40 @@ export class KimaiTimerViewProvider implements vscode.WebviewViewProvider {
 									: "No Project";
 
 							return `
-								 <div style="
-									margin-bottom:10px;
-									padding:8px;
-									border:1px solid var(--vscode-editorWidget-border);
-									border-radius:4px;
-									word-wrap:break-word;
-									overflow-wrap:break-word;
-									max-width:300px;
-									">
-									<strong>${projectName}</strong><br>
-									<strong>Activity:</strong> ${
-										activities.find((a) => a.id === timesheet.activity)?.name ||
-										""
-									}<br>
-									<strong>Description:</strong> <span style="
-										display:inline-block;
-										max-width:100%;
-										white-space:nowrap;
-										overflow:hidden;
-										text-overflow:ellipsis;
-										vertical-align:bottom;
-									">
-										${timesheet.description || ""}
-									</span><br>
-									<button onclick="stopTimer('${timesheet.id}')">⏹ Stop Timer</button>
-								</div>`;
+								 <div class="timer-card">
+									<div class="timer-card-header">
+										<strong>${projectName}</strong>
+									</div>
+									<div class="timer-card-details active">
+										<div>
+										<strong>Activity:</strong> ${
+											activities.find((a) => a.id === timesheet.activity)
+												?.name || ""
+										}
+										</div>
+										${
+											timesheet.description
+												? `<div>
+												<strong>Description:</strong>
+												<span class="truncate-text">
+												${timesheet.description.replace(/"/g, "&quot;")}
+												</span>
+											</div>`
+												: ""
+										}
+										${
+											timesheet.tags && timesheet.tags.length
+												? `<div><strong>Tags:</strong> <span class="tags">${timesheet.tags
+														.map(
+															(tag) => `<span class="tag-pill">${tag}</span>`
+														)
+														.join("")}</span></div>`
+												: ""
+										}
+										<button onclick="stopTimer('${timesheet.id}')">⏹ Stop Timer</button>
+									</div>
+								</div>
+							`;
 						})
 						.join("")
 				: `<p>No active timers.</p>`;
