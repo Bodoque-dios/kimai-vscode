@@ -112,10 +112,8 @@ export class KimaiTimerViewProvider implements vscode.WebviewViewProvider {
 		const config = vscode.workspace.getConfiguration("kimai-vscode");
 		const url = config.get("url")!;
 		const token = await this.context.secrets.get("kimaiToken");
-		if (!token) {
-			vscode.window.showErrorMessage(
-				"API token is not set. Run 'Kimai vscode: Set API Token' command."
-			);
+		if (!url || !token) {
+			this._view.webview.html = this._getSetupHtml();
 			return;
 		}
 		this._view.webview.html = this._getLoadingHtml();
@@ -676,6 +674,33 @@ export class KimaiTimerViewProvider implements vscode.WebviewViewProvider {
 				</body>
 			</html>
 			`;
+	}
+
+	_getSetupHtml(): string {
+		return `
+			<html>
+				<body>
+					<h2>Kimai Setup Required</h2>
+					<p>
+						To use this extension, you need a running 
+						<a href="https://www.kimai.org" target="_blank">Kimai</a> instance 
+							with API access enabled.
+					</p>
+					<p>Please set up the Kimai URL and API token:</p>
+					<ol>
+						<li>Open the command palette (<code>Ctrl+Shift+P</code>).</li>
+						<li>Run <strong>Kimai: Set URL</strong> to configure the server URL.</li>
+						<li>Run <strong>Kimai: Set API Token</strong> to save your API token securely.</li>
+					</ol>
+					<p>
+						After configuration, reload this view by clicking the reload icon 
+						at the top right corner of this panel.
+					</p>
+					${this._commonStyles()}
+				</body>
+			</html>
+
+		`;
 	}
 }
 

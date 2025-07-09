@@ -78,7 +78,7 @@
 			"properties": {
 				"kimai-vscode.url": {
 					"type": "string",
-					"default": "[https://your-kimai-url](https://your-kimai-url)",
+					"default": "",
 					"description": "Base URL of your Kimai instance"
 				}
 			}
