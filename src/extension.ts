@@ -118,6 +118,7 @@ export class KimaiTimerViewProvider implements vscode.WebviewViewProvider {
 			);
 			return;
 		}
+		this._view.webview.html = this._getLoadingHtml();
 		try {
 			// Run all fetches in parallel
 			const [
@@ -653,6 +654,28 @@ export class KimaiTimerViewProvider implements vscode.WebviewViewProvider {
 			clearInterval(statusBarInterval);
 			statusBarInterval = undefined;
 		}
+	}
+
+	_getLoadingHtml(): string {
+		return `
+			<html>
+				<body>
+				<div style="
+					display:flex;
+					justify-content:center;
+					align-items:center;
+					height:100vh;
+					font-family: var(--vscode-font-family);
+					color: var(--vscode-editor-foreground);
+					background: var(--vscode-editor-background);
+				">
+					<div>
+					<span>⏳ Loading...</span>
+					</div>
+				</div>
+				</body>
+			</html>
+			`;
 	}
 }
 
