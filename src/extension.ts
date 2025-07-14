@@ -343,6 +343,7 @@ export class KimaiTimerViewProvider implements vscode.WebviewViewProvider {
 				<div id="newTimerSection">
 					<label for="client">Client</label>
 					<select id="client"  onchange="updateProjectOptions()">
+						<option value="">Select Client</option>
 						${customersOptions}
 					</select>
 
