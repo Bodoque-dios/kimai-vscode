@@ -212,7 +212,6 @@ export class KimaiTimerViewProvider implements vscode.WebviewViewProvider {
 		recentTimesheets: KimaiTimesheetEntry[],
 		tags: string[]
 	): string {
-		
 		//------------------- CUSTOMER FILTER -------------------
 		const projectsByCustomer = customers.reduce((acc, customer) => {
 			acc[customer.id] = projects.filter((p) => p.customer === customer.id);
@@ -535,7 +534,25 @@ export class KimaiTimerViewProvider implements vscode.WebviewViewProvider {
 			}),
 		});
 		if (!response.ok) {
-			throw new Error(await response.text());
+			const errorText = await response.text();
+			console.error("Failed to start timer:", {
+				status: response.status,
+				error: errorText,
+				request: {
+					url: `${url}/api/timesheets`,
+					method: "POST",
+					body: {
+						project: Number(message.project),
+						activity: Number(message.activity),
+						description: message.description,
+						tags: message.tags,
+					},
+				},
+			});
+			vscode.window.showErrorMessage("Failed to start timer");
+			throw new Error(
+				`Failed to start timer`
+			);
 		}
 		vscode.window.showInformationMessage("Timer started.");
 	}
