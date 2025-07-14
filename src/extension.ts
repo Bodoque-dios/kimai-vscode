@@ -414,6 +414,28 @@ export class KimaiTimerViewProvider implements vscode.WebviewViewProvider {
 						// Clear existing options
 						projectSelect.innerHTML = '';
 
+						if (selectedClientId === '') {
+							// set all projects if no client is selected
+							const allProjects = Object.values(projectsByCustomer).flat();
+							if (allProjects.length < 1) {
+								// Add placeholder option
+								const placeholder = document.createElement('option');
+								placeholder.value = '';
+								placeholder.textContent = 'No Projects available';
+								projectSelect.appendChild(placeholder);
+							} else {
+								// Populate new options
+								allProjects.forEach(p => {
+									const option = document.createElement('option');
+									option.value = p.id;
+									option.textContent = p.name;
+									projectSelect.appendChild(option);
+								});
+							}
+							updateActivitiesOptions();
+							return;
+						}
+
 						// Get projects for selected client
 						const projects = projectsByCustomer[selectedClientId] || [];
 
