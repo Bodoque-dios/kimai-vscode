@@ -342,13 +342,13 @@ export class KimaiTimerViewProvider implements vscode.WebviewViewProvider {
 				<h3>Start New Timer</h3>
 				<div id="newTimerSection">
 					<label for="client">Client</label>
-					<select id="client"  onchange="updateProjectOptions()">
+					<select id="client" onchange="updateProjectOptions()">
 						<option value="">Select Client</option>
 						${customersOptions}
 					</select>
 
 					<label for="project">Project</label>
-					<select id="project">
+					<select id="project" onchange="updateActivitiesOptions()">
 						${projectsOptions}
 					</select>
 
@@ -371,6 +371,7 @@ export class KimaiTimerViewProvider implements vscode.WebviewViewProvider {
 				</div>
 				<script>
 					const projectsByCustomer = ${JSON.stringify(projectsByCustomer)};
+					const activities = ${JSON.stringify(activities)};
 					const vscode = acquireVsCodeApi();
 
 					function start() {
@@ -453,6 +454,35 @@ export class KimaiTimerViewProvider implements vscode.WebviewViewProvider {
 							option.value = p.id;
 							option.textContent = p.name;
 							projectSelect.appendChild(option);
+						});
+						updateActivitiesOptions();
+					}
+
+					function updateActivitiesOptions() {
+						const projectSelect = document.getElementById('project');
+						const activitySelect = document.getElementById('activity');
+						const selectedProjectId = projectSelect.value;
+
+						// Clear existing options
+						activitySelect.innerHTML = '';
+
+						if (selectedProjectId === '') {
+							// Add placeholder option
+							const placeholder = document.createElement('option');
+							placeholder.value = '';
+							placeholder.textContent = 'No Activities available';
+							activitySelect.appendChild(placeholder);
+							return;
+						}
+
+						// Populate new options
+						activities.forEach(a => {
+							if (a.project === Number(selectedProjectId) || a.project === null) {
+								const option = document.createElement('option');
+								option.value = a.id;
+								option.textContent = a.name;
+								activitySelect.appendChild(option);
+							}
 						});
 					}
 
