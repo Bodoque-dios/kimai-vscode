@@ -52,7 +52,6 @@ This project follows [Semantic Versioning](https://semver.org/).
   * Refined HTML and CSS to unify styling of timer cards.
   * Consistent conditional rendering of description and tags.
 
-
 ### Changed
 
 * **HTML Structure**
@@ -67,3 +66,32 @@ This project follows [Semantic Versioning](https://semver.org/).
 
 This marks the first **feature-complete version** of the extension.
 You now need a running Kimai instance and a valid API token to use all features.
+
+---
+
+## [0.1.1] - 2025-07-14
+
+### Added
+
+* **Default Client Option**
+
+  * Added a default `<option>` in the client selection dropdown to indicate no client selected (`"Select Client"`).
+
+* **Display All Projects When No Client Selected**
+
+  * Added logic to show all projects if no client is selected in the timer view.
+
+* **Dynamic Activity Options**
+
+  * Automatically update the list of activities based on the selected project when starting a timer.
+
+* **Extended Tests**
+
+  * Added additional test coverage for timer creation, client/project selection, and error cases.
+
+### Changed
+
+* **Improved Error Handling**
+
+  * Enhanced error handling in the timer start function.
+  * Log detailed error information to help diagnose API or network issues.

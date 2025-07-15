@@ -2,7 +2,7 @@
 	"name": "kimai-vscode",
 	"displayName": "Kimai VScode",
 	"description": "Integrate Kimai time tracking into VS Code. Start and stop timers, view activities and projects, and track your work from the editor.",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"license": "MIT",
 	"engines": {
 		"vscode": "^1.101.0"
