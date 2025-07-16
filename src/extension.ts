@@ -777,7 +777,7 @@ export class KimaiTimerViewProvider implements vscode.WebviewViewProvider {
 					</p>
 					<p>Please set up the Kimai URL and API token:</p>
 					<ol>
-						<li>Open the command palette (<code>Ctrl+Shift+P</code>).</li>
+						<li>Open the command palette (<code>Ctrl+Shift+P</code> or <code>Cmd+Shift+P</code> on Mac).</li>
 						<li>Run <strong>Kimai: Set URL</strong> to configure the server URL.</li>
 						<li>Run <strong>Kimai: Set API Token</strong> to save your API token securely.</li>
 					</ol>
