@@ -95,3 +95,24 @@ You now need a running Kimai instance and a valid API token to use all features.
 
   * Enhanced error handling in the timer start function.
   * Log detailed error information to help diagnose API or network issues.
+
+---
+
+## [0.1.2] - 2025-07-16
+
+### Changed
+
+* **Improved Setup Instructions**
+
+  * Clarified the correct command for setting the Kimai server URL.
+  * Added platform-specific instructions for opening the command palette on macOS (⌘+Shift+P).
+
+### Added
+
+* **URL Setting Validation**
+
+  * Enhanced the `kimai-vscode.url` configuration field with a validation pattern to ensure a proper URL format (must start with `http(s)` and not end with a slash).
+  * Improved description text to guide the user when configuring the extension.
+
+**Note:**
+These improvements were made based on suggestions from the Kimai maintainer @kevinpapst thanks for the helpful feedback!
