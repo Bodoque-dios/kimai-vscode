@@ -80,7 +80,9 @@
 				"kimai-vscode.url": {
 					"type": "string",
 					"default": "",
-					"description": "Base URL of your Kimai instance"
+					"description": "Base URL of your Kimai instance (e.g., https://yourdomain.com/kimai or https://kimai.youdomain.com) without the trailing slash.",
+					"pattern": "^(https?://.+[^/])?$",
+					"patternErrorMessage": "Must be a valid URL starting with http(s) and without a trailing slash."
 				}
 			}
 		}
